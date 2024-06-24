@@ -3,10 +3,9 @@
 #include <WiFi.h>
 #include <ArduinoJson.h>
 #include  "./Sensors/Sensor.h"
+#include "./secrets.h"
 
-#define WIFI_SSID "###"
-#define WIFI_PASS "###"
-#define BACKEND_URI "http://192.168.1.###:5000/sensor_logs"
+#define BACKEND_URI "http://192.168.1.100:3000/sensor_logs"
 #define SOIL_MOISTURE_PIN 34
 
 WiFiClient wifi_client;
@@ -18,14 +17,13 @@ int sleep_hours = 1;
 
 void connectToWifi() {
     WiFi.mode(WIFI_MODE_STA);
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
-    Serial.printf("Connecting to access point: %s", WIFI_SSID);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
     while (WiFi.status() != WL_CONNECTED) {
-        Serial.println("Attempting connection to Wifi");
         delay(1000);
     }
-    const IPAddress address = WiFi.localIP();
-    Serial.println("Assigned IP: " + address.toString());
+
+    Serial.println("Assigned IP: " + WiFi.localIP().toString());
 }
 
 void send_sensor_log(SensorLog log) {
@@ -45,6 +43,7 @@ void enterDeepSleep() {
 }
 
 void setup() {
+    Serial.begin(115200);
     connectToWifi();
     send_sensor_log(moisture_sensor.get_moisture_reading());
     enterDeepSleep();
